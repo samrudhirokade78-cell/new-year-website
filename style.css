@@ -1,71 +1,49 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
 }
 
-body {
-  height: 100vh;
-  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+class Firework {
+  constructor() {
+    this.x = random(0, canvas.width);
+    this.y = canvas.height;
+    this.targetY = random(100, canvas.height / 2);
+    this.color = `hsl(${random(0, 360)}, 100%, 50%)`;
+  }
+
+  update() {
+    this.y -= 5;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
 }
 
-.container {
-  text-align: center;
-  padding: 30px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+let fireworks = [];
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (Math.random() < 0.05) {
+    fireworks.push(new Firework());
+  }
+
+  fireworks.forEach((fw, index) => {
+    fw.update();
+    fw.draw();
+    if (fw.y < fw.targetY) fireworks.splice(index, 1);
+  });
+
+  requestAnimationFrame(animate);
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-p {
-  margin-bottom: 20px;
-}
-
-#countdown {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-#countdown div {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 15px;
-  border-radius: 10px;
-  width: 80px;
-}
-
-#countdown span {
-  font-size: 1.8rem;
-  display: block;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  background: #ff9800;
-  color: black;
-}
-
-button:hover {
-  background: #ffc107;
-}
-
-#message {
-  margin-top: 15px;
-  font-size: 1.1rem;
-  color: #ffd700;
-}
+animate();
